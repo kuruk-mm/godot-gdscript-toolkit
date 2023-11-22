@@ -29,7 +29,7 @@ from gdtoolkit.common.exceptions import (
 def main():
     arguments = docopt(
         __doc__,
-        version="gdparse {}".format(
+        version="gdparse {} (kuruk-mm fork)".format(
             pkg_resources.get_distribution("gdtoolkit").version
         ),
     )

@@ -43,7 +43,7 @@ CONFIG_FILE_NAME = "gdlintrc"
 def main():
     arguments = docopt(
         __doc__,
-        version="gdlint {}".format(pkg_resources.get_distribution("gdtoolkit").version),
+        version="gdlint {} (kuruk-mm fork)".format(pkg_resources.get_distribution("gdtoolkit").version),
     )
 
     if arguments["--verbose"]:

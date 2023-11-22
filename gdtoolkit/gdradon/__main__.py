@@ -31,7 +31,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     arguments = docopt(
         __doc__,
-        version="gdradon {}".format(
+        version="gdradon {} (kuruk-mm fork)".format(
             pkg_resources.get_distribution("gdtoolkit").version
         ),
     )

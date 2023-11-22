@@ -48,7 +48,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     arguments = docopt(
         __doc__,
-        version="gdformat {}".format(
+        version="gdformat {} (kuruk-mm fork)".format(
             pkg_resources.get_distribution("gdtoolkit").version
         ),
     )

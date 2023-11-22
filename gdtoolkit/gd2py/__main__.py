@@ -28,7 +28,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     arguments = docopt(
         __doc__,
-        version="gd2py {}".format(pkg_resources.get_distribution("gdtoolkit").version),
+        version="gd2py {} (kuruk-mm fork)".format(pkg_resources.get_distribution("gdtoolkit").version),
     )
     with open(arguments["<path>"], "r", encoding="utf-8") as handle:
         print(convert_code(handle.read()))
