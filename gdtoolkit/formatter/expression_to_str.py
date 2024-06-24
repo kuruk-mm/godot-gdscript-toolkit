@@ -20,7 +20,9 @@ def expression_to_str(expression: Node) -> str:
     if isinstance(expression, Token):
         token_handlers = {
             "LONG_STRING": _long_string_to_str,
+            "LONG_RSTRING": _long_rstring_to_str,
             "REGULAR_STRING": _regular_string_to_str,
+            "REGULAR_RSTRING": _regular_rstring_to_str,
         }
         if expression.type in token_handlers:
             return token_handlers[expression.type](expression)
@@ -77,6 +79,7 @@ def expression_to_str(expression: Node) -> str:
         "c_dict_element": _dict_element_to_str,
         "eq_dict_element": _dict_element_to_str,
         "string": lambda e: expression_to_str(e.children[0]),
+        "rstring": lambda e: f"r{expression_to_str(e.children[0])}",
         "get_node": lambda e: f"${expression_to_str(e.children[0])}",
         "path": lambda e: "".join([name_token.value for name_token in e.children]),
         "node_path": lambda e: f"^{expression_to_str(e.children[0])}",
@@ -145,6 +148,7 @@ def expression_to_str(expression: Node) -> str:
         "non_foldable_dot_chain": lambda e: "".join(map(expression_to_str, e.children)),
         "actual_getattr_call": _getattr_call_to_str,
         "actual_subscr_expr": _subscription_to_str,
+        "property_custom_getter_args": lambda _: "()",
         # patterns (fake expressions):
         "list_pattern": lambda e: ", ".join(map(expression_to_str, e.children)),
         "test_pattern": _operator_chain_based_expression_to_str,
@@ -316,6 +320,11 @@ def _long_string_to_str(string: Token) -> str:
     return actual_string
 
 
+def _long_rstring_to_str(rstring: Token) -> str:
+    actual_string = rstring.value
+    return _long_string_to_str(Token("LONG_STRING", actual_string[1:]))
+
+
 def _regular_string_to_str(string: Token) -> str:
     actual_string = string.value
     actual_string_data = actual_string[1:-1]
@@ -329,3 +338,8 @@ def _regular_string_to_str(string: Token) -> str:
         actual_string_data = actual_string_data.replace('\\"', '"')
         actual_string_data = actual_string_data.replace("'", "\\'")
     return "{}{}{}".format(target, actual_string_data, target)  # pylint: disable=W1308
+
+
+def _regular_rstring_to_str(rstring: Token) -> str:
+    actual_string = rstring.value
+    return _regular_string_to_str(Token("REGULAR_STRING", actual_string[1:]))

@@ -15,7 +15,7 @@ from .expression_utils import (
     is_trailing_comma,
 )
 from .expression_to_str import expression_to_str
-from .constants import INDENT_SIZE
+from .constants import TAB_INDENT_SIZE
 
 
 def format_expression(
@@ -91,7 +91,7 @@ def _format_foldable(
     single_line_number, single_line = _format_concrete_expression_to_single_line(
         expression, expression_context, context
     )[0]
-    single_line_length = len(single_line.replace("\t", " " * INDENT_SIZE))
+    single_line_length = len(single_line.replace("\t", " " * TAB_INDENT_SIZE))
     if single_line_length <= context.max_line_length:
         return [(single_line_number, single_line)]
     return _format_foldable_to_multiple_lines(expression, expression_context, context)
@@ -195,6 +195,27 @@ def _format_foldable_to_multiple_lines(
         "dot_chain": _format_dot_chain_to_multiple_lines,
         "actual_getattr_call": _format_call_expression_to_multiple_lines,
         "actual_subscr_expr": _format_subscription_to_multiple_lines,
+        # patterns (fake expressions):
+        "list_pattern": _format_concrete_expression_to_single_line,
+        "test_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "par_pattern": _format_parentheses_to_multiple_lines,
+        "or_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "and_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "not_pattern": _format_concrete_expression_to_single_line,
+        "comp_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "bitw_or_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "bitw_xor_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "bitw_and_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "shift_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "arith_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "mdr_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "neg_pattern": _format_concrete_expression_to_single_line,
+        "bitw_not_pattern": _format_concrete_expression_to_single_line,
+        "attr_pattern": _format_operator_chain_based_expression_to_multiple_lines,
+        "call_pattern": _format_call_expression_to_multiple_lines,
+        "array_pattern": _format_array_to_multiple_lines,
+        "dict_pattern": _format_dict_to_multiple_lines,
+        "kv_pair_pattern": _format_kv_pair_to_multiple_lines,
     }  # type: Dict[str, Callable]
     return handlers[expression.data](expression, expression_context, context)
 
@@ -240,7 +261,7 @@ def _format_args_to_multiple_lines(
 def _format_kv_pair_to_multiple_lines(
     expression: Tree, expression_context: ExpressionContext, context: Context
 ) -> FormattedLines:
-    suffix = ":" if expression.data == "c_dict_element" else " ="
+    suffix = ":" if expression.data in ["c_dict_element", "kv_pair_pattern"] else " ="
     key_expression_context = ExpressionContext(
         expression_context.prefix_string,
         expression_context.prefix_line,
@@ -821,7 +842,7 @@ def _format_dot_chain_to_multiple_lines(
         dot_chain, expression_context, context
     )
     if all(
-        len(line.replace("\t", " " * INDENT_SIZE)) <= context.max_line_length
+        len(line.replace("\t", " " * TAB_INDENT_SIZE)) <= context.max_line_length
         for line_number, line in lines_formatted_bottom_up
     ):
         return lines_formatted_bottom_up

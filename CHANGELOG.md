@@ -1,11 +1,37 @@
 # Changelog
 
-## [not released]
+## [master]
+
+### Added
+ - Added `gdformatrc` configuration file to `gdformat`
+ - Added support for Allman-style enum definitions to parser
+ - Added support for string-based unique node names
+ - Added support for properties in `gd2py`
+ - Added support for `get():` property syntax
+ - Added support for multiline arrays and dictionaries in `match` statement branches
+ - Added support for guarded `match` branches
+
+### Changed
+ - Fixed support for `breakpoint` statement in formatter
+
+## [4.2.2] 2023-12-11
+
+### Changed
+ - Fixed support for r-strings
+
+## [4.2.1] 2023-12-10
+
+### Added
+ - Added support for multiline patterns within `match` statement branches
+ - Added support for r-strings
+
+## [4.2.0] 2023-11-30
 
 ### Added
  - Added support for `breakpoint` statement
  - Added support for function-level annotations
  - Added support for typed `for` loop iterator (#241)
+ - Added the `--use-spaces=<int>` option to `gdformat` so that space-based indentations can be used instead of tab-based ones
 
 ### Changed
  - Fixed `max-public-methods` linter check disabling (#222)
@@ -14,6 +40,7 @@
  - Fixed linter support for docstrings (#233)
  - Fixed linter support for trailing comma in function's args list (#206)
  - Fixed linter support for static variables and classnames bundled with `extends` (#242)
+ - Enforced function statement annotations to be formatted to separate lines (#252)
 
 ## [4.1.0] 2023-07-06
 
