@@ -3,6 +3,22 @@
 ## [master]
 
 ### Added
+ - Added support for multi-statement lambdas (#191)
+
+### Changed
+ - Removed `private-method-call` linter check due to false positives when calling `super._foo()`
+ - Fixed support for `get_node` syntax to accommodate for `$/(...)`
+ - Changed formatting of some uni-statement lambdas
+ - Changed formatting of multi-statement, inline lambdas
+
+## [4.3.1] 2024-08-24
+
+### Added
+ - Added support for `is not` type test
+
+## [4.3.0] 2024-08-18
+
+### Added
  - Added `gdformatrc` configuration file to `gdformat`
  - Added support for Allman-style enum definitions to parser
  - Added support for string-based unique node names
@@ -13,6 +29,7 @@
 
 ### Changed
  - Fixed support for `breakpoint` statement in formatter
+ - Fixed nested unique name (`%`)
 
 ## [4.2.2] 2023-12-11
 
