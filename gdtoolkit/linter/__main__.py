@@ -20,7 +20,7 @@ import logging
 import pathlib
 from typing import List, Optional
 from types import MappingProxyType
-import pkg_resources
+from importlib.metadata import version as pkg_version
 
 import lark
 import yaml
@@ -43,7 +43,7 @@ CONFIG_FILE_NAME = "gdlintrc"
 def main():
     arguments = docopt(
         __doc__,
-        version="gdlint {} (kuruk-mm fork)".format(pkg_resources.get_distribution("gdtoolkit").version),
+        version="gdlint {} (kuruk-mm fork)".format(pkg_version("gdtoolkit")),
     )
 
     if arguments["--verbose"]:
@@ -154,6 +154,14 @@ def _lint_file(file_path: str, config: MappingProxyType) -> int:
         print(
             f"{file_path}:\n",
             lark_unexpected_input_to_str(exception),
+            sep="\n",
+            file=sys.stderr,
+        )
+        return 1
+    except lark.indenter.DedentError as exception:
+        print(
+            f"{file_path}:\n",
+            str(exception),
             sep="\n",
             file=sys.stderr,
         )

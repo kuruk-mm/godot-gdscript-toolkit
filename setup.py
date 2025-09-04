@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="gdtoolkit",
-    version="4.3.2",
+    version="4.3.4",
     description="Independent set of tools for working with GDScript - parser, linter and formatter",
     keywords=["GODOT", "GDSCRIPT", "PARSER", "LINTER", "FORMATTER"],
     url="https://github.com/Scony/godot-gdscript-toolkit",
@@ -31,7 +31,7 @@ setup(
     },
     include_package_data=True,
     install_requires=[
-        "lark[regex]==1.1.9",
+        "lark[regex]==1.2.2",
         "docopt-ng==0.9.0",
         "pyyaml>=5.1",
         "radon==6.0.1",

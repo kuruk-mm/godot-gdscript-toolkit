@@ -3,13 +3,38 @@
 ## [master]
 
 ### Added
+ - Added support for @abstract functions
+
+### Changed
+ - Fixed formatting of `@warning_ignore_start` and `@warning_ignore_restore`
+ - Fixed formatting of `shadowed_variable*` ignore annotations
+
+## [4.3.4] 2025-06-29
+
+### Changed
+ - Fixed linter problem reports when global scope is used
+ - Fixed formatting of certain `@warning_ignore` annotations
+
+## [4.3.3] 2024-11-02
+
+### Changed
+ - Fixed false-positive `expression-not-assigned` linter check on lambdas
+ - Fixed erroneous DedentError raised in case of inline lambas
+
+## [4.3.2] 2024-10-20
+
+### Added
  - Added support for multi-statement lambdas (#191)
+ - Added support for typed dictionaries (#322)
 
 ### Changed
  - Removed `private-method-call` linter check due to false positives when calling `super._foo()`
  - Fixed support for `get_node` syntax to accommodate for `$/(...)`
+ - Fixed `gd2py` and `gdradon` to support latest GDScript
  - Changed formatting of some uni-statement lambdas
  - Changed formatting of multi-statement, inline lambdas
+ - Changed formatting of dot-chains containing a lambda(s)
+ - Changed linter check `class-definitions-order` in a way that static class variables are recommended to be placed just after constants
 
 ## [4.3.1] 2024-08-24
 

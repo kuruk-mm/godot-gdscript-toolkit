@@ -3,7 +3,7 @@ from typing import List
 
 from lark import Tree
 
-from ..formatter.annotation import STANDALONE_ANNOTATIONS
+from ..formatter.annotation import is_non_standalone_annotation
 
 from .utils import find_name_token_among_children, find_tree_among_children
 from .exceptions import GDToolkitError
@@ -39,6 +39,9 @@ class Statement:
             raise NotImplementedError
         if self.kind in ["func_def", "static_func_def"]:
             self.sub_statements = [Statement(n) for n in self.lark_node.children[1:]]
+        elif self.kind == "abstract_func_def":
+            # Abstract functions don't have a body, so no sub-statements
+            pass
         elif self.kind == "if_stmt":
             for branch in self.lark_node.children:
                 if branch.data in ["if_branch", "elif_branch"]:
@@ -114,6 +117,7 @@ class Class:
         if parse_tree.data == "start":
             start = parse_tree
             self._load_data_from_node_children(start)
+            self.name = "global scope"
         elif parse_tree.data == "class_def":
             self._load_data_from_class_def(parse_tree)
         else:
@@ -123,9 +127,7 @@ class Class:
         offset = 1 if node.data == "class_def" else 0
         annotations = []
         for stmt in node.children[offset:]:
-            if stmt.data == "annotation" and not _is_annotation_standalone(
-                Annotation(stmt)
-            ):
+            if stmt.data == "annotation" and is_non_standalone_annotation(stmt):
                 annotations.append(Annotation(stmt))
                 continue
             if stmt.data == "property_body_def":
@@ -139,6 +141,10 @@ class Class:
                 self.all_sub_classes += [sub_class] + sub_class.all_sub_classes
                 self.all_functions += sub_class.all_functions
             if stmt.data == "func_def":
+                function = Function(stmt)
+                self.functions.append(function)
+                self.all_functions.append(function)
+            if stmt.data == "abstract_func_def":
                 function = Function(stmt)
                 self.functions.append(function)
                 self.all_functions.append(function)
@@ -158,7 +164,3 @@ class AbstractSyntaxTree:
         self.root_class = Class(parse_tree)
         self.all_classes = [self.root_class] + self.root_class.all_sub_classes
         self.all_functions = self.root_class.all_functions
-
-
-def _is_annotation_standalone(annotation: Annotation) -> bool:
-    return annotation.name in STANDALONE_ANNOTATIONS

@@ -15,11 +15,16 @@ from .safety_checks import (  # noqa: F401
 DEFAULT_CONFIG = MappingProxyType(
     {
         "excluded_directories": {".git"},
+        "safety_checks": None,
+        "use_spaces": None,
+        "line_length": 100,
     }
 )
 
 
 # pylint: disable-next=too-many-arguments
+# pylint: disable=too-many-positional-arguments
+# pylint: disable=too-many-arguments
 def check_formatting_safety(
     given_code: str,
     formatted_code: str,

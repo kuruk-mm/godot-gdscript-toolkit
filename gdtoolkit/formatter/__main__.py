@@ -16,7 +16,6 @@ Options:
                              (implies --check).
   -f --fast                  Skip safety checks.
   -l --line-length=<int>     How many characters per line to allow.
-                             [default: 100]
   -s --use-spaces=<int>      Use spaces for indent instead of tabs.
   -h --help                  Show this screen.
   --version                  Show version.
@@ -25,6 +24,7 @@ Options:
 Examples:
   echo 'pass' | gdformat -   # reads from STDIN
 """
+
 import sys
 import os
 import logging
@@ -32,7 +32,7 @@ import pathlib
 import difflib
 from typing import List, Tuple, Optional
 from types import MappingProxyType
-import pkg_resources
+from importlib.metadata import version as pkg_version
 
 from docopt import docopt
 import lark
@@ -58,9 +58,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     arguments = docopt(
         __doc__,
-        version="gdformat {} (kuruk-mm fork)".format(
-            pkg_resources.get_distribution("gdtoolkit").version
-        ),
+        version="gdformat {} (kuruk-mm fork)".format(pkg_version("gdtoolkit")),
     )
 
     if arguments["--dump-default-config"]:
@@ -69,14 +67,6 @@ def main():
     if arguments["--diff"]:
         arguments["--check"] = True
 
-    line_length = int(arguments["--line-length"])
-    spaces_for_indent = (
-        int(arguments["--use-spaces"])
-        if arguments["--use-spaces"] is not None
-        else None
-    )
-    safety_checks = not arguments["--fast"]
-
     config_file_path = _find_config_file()
     config = _load_config_file_or_default(config_file_path)
     _log_config_entries(config)
@@ -84,6 +74,24 @@ def main():
 
     files: List[str] = find_gd_files_from_paths(
         arguments["<path>"], excluded_directories=set(config["excluded_directories"])
+    )
+
+    line_length = (
+        int(arguments["--line-length"])
+        if arguments["--line-length"]
+        else config.get("line_length", DEFAULT_CONFIG["line_length"])
+    )
+
+    spaces_for_indent = (
+        int(arguments["--use-spaces"])
+        if arguments["--use-spaces"]
+        else config.get("use_spaces", DEFAULT_CONFIG["use_spaces"])
+    )
+
+    safety_checks = (
+        not arguments["--fast"]
+        if arguments.get("--fast")
+        else config.get("safety_checks", DEFAULT_CONFIG["safety_checks"])
     )
 
     if files == ["-"]:
@@ -309,6 +317,14 @@ def _format_code(
         print(
             f"{file_path}:\n",
             lark_unexpected_input_to_str(exception),
+            sep="\n",
+            file=sys.stderr,
+        )
+    except lark.indenter.DedentError as exception:
+        success = False
+        print(
+            f"{file_path}:\n",
+            str(exception),
             sep="\n",
             file=sys.stderr,
         )

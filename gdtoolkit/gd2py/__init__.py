@@ -38,6 +38,7 @@ def _convert_statement(statement: Tree, context: Context) -> List[str]:
         "annotation": _ignore,
         "pass_stmt": lambda s, c: [f"{c.indent_string}pass"],
         "class_var_stmt": _convert_first_child_as_statement,
+        "static_class_var_stmt": _convert_first_child_as_statement,
         "class_var_empty": lambda s, c: [
             f"{c.indent_string}{s.children[0].value} = None"
         ],
@@ -63,6 +64,8 @@ def _convert_statement(statement: Tree, context: Context) -> List[str]:
             )
         ],
         "static_func_def": _convert_first_child_as_statement,
+        "abstract_func_def": _convert_abstract_func_def,
+        "docstr_stmt": _pass,
         # func statements:
         "func_var_stmt": _convert_first_child_as_statement,
         "func_var_empty": lambda s, c: [
@@ -87,6 +90,7 @@ def _convert_statement(statement: Tree, context: Context) -> List[str]:
             )
         ],
         "break_stmt": lambda s, c: [f"{c.indent_string}break"],
+        "breakpoint_stmt": lambda s, c: [f"{c.indent_string}breakpoint"],
         "continue_stmt": lambda s, c: [f"{c.indent_string}continue"],
         "if_stmt": lambda s, c: _convert_block(s.children, c),
         "if_branch": partial(_convert_branch_with_expression, "if"),
@@ -112,6 +116,7 @@ def _convert_statement(statement: Tree, context: Context) -> List[str]:
         + _convert_block(s.children[3:], c.create_child_context(-2)),
         "match_stmt": _convert_match_statement,
         "match_branch": partial(_convert_branch_with_expression, "elif"),
+        "guarded_match_branch": partial(_convert_branch_with_expression, "elif"),
     }  # type: Dict[str, Callable]
     return handlers[statement.data](statement, context)
 
@@ -158,6 +163,16 @@ def _convert_func_def(statement: Tree, context: Context) -> List[str]:
     return [
         f"{context.indent_string}def {statement.children[0].children[0].value}():",
     ] + _convert_block(statement.children[1:], context.create_child_context(-1))
+
+
+def _convert_abstract_func_def(statement: Tree, context: Context) -> List[str]:
+    # Abstract functions don't have a body, so we create a function that raises NotImplementedError
+    func_header = statement.children[0]
+    func_name = func_header.children[0].value
+    return [
+        f"{context.indent_string}def {func_name}():",
+        f"{context.indent_string}    raise NotImplementedError('Abstract method not implemented')",
+    ]
 
 
 def _convert_branch_with_expression(
